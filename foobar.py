@@ -1,6 +1,9 @@
 #!/usr/bin/python -tt
 
-import os, re, logging, platform
+import os
+import re
+import logging
+import platform
 
 class FooBar:
     population = 0
