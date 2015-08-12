@@ -45,7 +45,7 @@ class FooBar:
 def main():
 
     if platform.platform().startswith('Windows'):
-        logging_file = os.path.join(os.getenv('HOMEDRIVE'), os.getenv('HOMEPATH'),'test.log')
+        logging_file = os.path.join(os.getenv('HOMEDRIVE'), os.getenv('HOMEPATH'), 'test.log')
     else:
         logging_file = os.path.join(os.getenv('HOME'), 'test.log')
 
