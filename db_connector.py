@@ -22,6 +22,9 @@ class DBConnector:
         def get_cursor(self):
             return self.connection.cursor()
 
+        def commit(self):
+            self.connection.commit()
+
     def __init__(self, connection_str):
         if not DBConnector.instance:
             DBConnector.instance = DBConnector.Connector(connection_str)
@@ -45,6 +48,10 @@ class DBConnector:
     def cursor(cls):
         return DBConnector.instance.get_cursor()
 
+    @classmethod
+    def commit(cls):
+        return DBConnector.instance.commit()
+
 def version():
     print(DBConnector.version())
 
@@ -64,12 +71,23 @@ def binding_test():
     cur.execute(None, {'status': 'Approve'})
     res = cur.fetchall()
     print(res)
+    cur.close()
+
+
+def update():
+    cur = DBConnector.cursor()
+    cur.prepare("update ACT_HI_TASKINST set NAME_='Initial' where ID_ = :id")
+    cur.execute(None, {'id': 'abc'})
+    cur.close()
+    DBConnector.commit()
+
 
 def main():
     DBConnector("rascal/rascal@127.0.0.1/XE")
     version()
     what_time()
     binding_test()
+    update()
 
 if __name__ == '__main__':
     main()
