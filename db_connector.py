@@ -11,6 +11,7 @@ class DBConnector:
             self.error_msg = 'no error'
             self.error_code = 0
             self.connection = cx_Oracle.connect(connection_str)
+            print(connection_str)
 
         def __str__(self):
             return repr(self) + self.connection_str
@@ -24,6 +25,9 @@ class DBConnector:
         def commit(self):
             self.connection.commit()
 
+        def close(self):
+            self.connection.close()
+
     def __init__(self, connection_str):
         if not DBConnector.instance:
             DBConnector.instance = DBConnector.Connector(connection_str)
@@ -33,11 +37,12 @@ class DBConnector:
     def get_cursor(self):
         return DBConnector.instance.self.get_cursor()
 
-    def close(self):
-        DBConnector.instance.self.connection.close()
-
     def get_error_details(self):
         return DBConnector.instance.self.error_code, DBConnector.instance.self.error_msg
+
+    @classmethod
+    def close(cls):
+        DBConnector.instance.close()
 
     @classmethod
     def version(cls):
@@ -80,7 +85,6 @@ def update():
     cur.close()
     DBConnector.commit()
 
-
 def main():
     DBConnector("rascal/rascal@127.0.0.1/XE")
     version()
@@ -90,4 +94,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
