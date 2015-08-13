@@ -18,16 +18,6 @@ select ID_ from ACT_HI_PROCINST where BUSINESS_KEY_= :bizkey) \
 order by ACT_HI_TASKINST.END_TIME_ desc) T \
 where ROWNUM=1"
 
-sql_update_kaput = "update ACT_HI_TASKINST set TASK_DEF_KEY_='returnToPI', NAME_='Return to PI' \
-where ID_= :task_id and TASK_DEF_KEY_='kaput'"
-
-def update_kaput(task_id):
-    print("kaput task_id: %s" % task_id)
-    cursor = db_connector.DBConnector.cursor()
-    cursor.prepare(sql_update_kaput)
-    cursor.execute(None, {'task_id': task_id})
-    db_connector.DBConnector.commit()
-    cursor.close
 
 def get_task_id(bizkey):
     print('bizkey=%s' % bizkey)
@@ -89,7 +79,6 @@ def main():
     for oid in not_found_list:
         task_id = get_task_id(oid)
         print('task_id=%s' % task_id)
-        ### update_kaput(task_id)
 
     db_connector.DBConnector.close()
     sys.exit(0)
