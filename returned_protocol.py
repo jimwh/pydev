@@ -77,7 +77,7 @@ def get_returned_numbers():
 
 def main():
     if len(sys.argv) != 2:
-        print('usage: ./returned_protocol.py <connection string>')
+        print('usage: %s <connection string>' % sys.argv[0])
         sys.exit(1)
 
     db_connector.DBConnector(sys.argv[1])
