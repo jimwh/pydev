@@ -19,7 +19,7 @@ def download_attachment(bizkey):
     cursor.prepare(SQL_SELECT_STATMENT)
     cursor.execute(None, {'bizkey': bizkey})
 
-    dirname = "/tmp/iacuc"
+    dirname = "/tmp/iacuc/" + bizkey
     if not os.path.exists(dirname):
         os.makedirs(dirname)
 
@@ -33,6 +33,10 @@ def download_attachment(bizkey):
         except IOError:
             print('i/o error... %s' % filename)
 
+    if cursor.rowcount == 0:
+        print('no result for headerId=%s' % bizkey)
+    else:
+        print('number of items: %d' % cursor.rowcount)
     cursor.close()
 
 
