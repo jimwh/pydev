@@ -5,8 +5,7 @@ import os
 import cx_Oracle
 import db_connector
 #
-# local
-# rascal/rascal@127.0.0.1/XE
+# local:  rascal/rascal@127.0.0.1/XE
 #
 SQL_SELECT_STATMENT = "select A.NAME_, G.BYTES_ \
 from ACT_HI_ATTACHMENT A inner join ACT_HI_TASKINST T on A.TASK_ID_ = T.ID_ \
@@ -16,7 +15,6 @@ where P.BUSINESS_KEY_ = :bizkey"
 
 
 def download_attachment(bizkey):
-    print(bizkey)
     cursor = db_connector.DBConnector.cursor()
     cursor.prepare(SQL_SELECT_STATMENT)
     cursor.execute(None, {'bizkey': bizkey})
@@ -33,8 +31,9 @@ def download_attachment(bizkey):
             file.write(blob_data.read())
             file.close()
         except IOError:
-            print('i/o error...')
+            print('i/o error... %s' % filename)
 
+    cursor.close()
 
 
 def main():
