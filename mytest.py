@@ -8,7 +8,7 @@ def read_file(filename):
     return file.read()
 
 def main():
-    jobj = read_file("./foo.txt")
+    jobj = read_file("./iacucTaskForm1177842_1182605.ser")
     pobj = javaobj.loads(jobj)
     print(pobj)
 
