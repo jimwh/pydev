@@ -57,7 +57,7 @@ def main():
     db_connector.DBConnector(connection_str)
     rid = get_rid(sys.argv[2])
     if rid is None:
-        print("not found rid for uni=%s" % sys.argv[2])
+        print('not found rid for uni={}'.format(sys.argv[2]))
         db_connector.DBConnector.close()
         sys.exit(0)
     print_by_rid(rid)
@@ -66,6 +66,7 @@ def main():
 
 if __name__ == '__main__':
     if len(sys.argv) != 3:
-        print('usage: %s [prod|dev|staging|local] <uni>' % sys.argv[0])
+        # print('usage: %s [prod|dev|staging|local] <uni>' % sys.argv[0])
+        print('usage: {} [prod|dev|staging|local] <uni>'.format(sys.argv[0]))
         sys.exit(1)
     main()
