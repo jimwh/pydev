@@ -6,6 +6,33 @@ import db_connector
 import jproperties
 
 # --, 'Done')
+# first submission id and date between April and July
+SQL_FIRST_SUBMISSION_ID_DATE = "\
+select * from (\
+  select IACUCPROTOCOLHEADERPER_OID, STATUSCODEDATE, ROW_NUMBER () OVER (PARTITION BY IACUCPROTOCOLHEADERPER_OID\
+  ORDER BY STATUSCODEDATE ASC) rn from\
+(\
+  select IACUCPROTOCOLHEADERPER_OID, STATUSCODEDATE from IACUCPROTOCOLSTATUS\
+    where statuscode='Submit'\
+    and trunc(statusCodeDate) >= trunc(to_date('04/01/2015', 'MM/DD/yyyy'))\
+    and trunc(statusCodeDate) <  trunc(to_date('07/01/2015', 'MM/DD/yyyy'))\
+    and IACUCPROTOCOLHEADERPER_OID in (\
+    select distinct IACUCPROTOCOLHEADERPER_OID from (\
+      select STATUSCODE, IACUCPROTOCOLHEADERPER_OID, STATUSCODEDATE from IACUCPROTOCOLSTATUS\
+        where statuscode in ('Approve')\
+          and IACUCPROTOCOLHEADERPER_OID in (\
+          select IACUCPROTOCOLHEADERPER_OID from IACUCPROTOCOLSTATUS\
+            where statuscode='Submit'\
+              and trunc(statusCodeDate) >= trunc(to_date('04/01/2015', 'MM/DD/yyyy'))\
+              and trunc(statusCodeDate) <  trunc(to_date('07/01/2015', 'MM/DD/yyyy'))\
+          )\
+    and trunc(statusCodeDate) >= trunc(to_date('04/01/2015', 'MM/DD/yyyy'))\
+    and trunc(statusCodeDate) <  trunc(to_date('07/01/2015', 'MM/DD/yyyy'))\
+  )\
+)\
+)\
+) where rn=1"
+
 SQL_APPROVAL_COUNT = "\
 select count(distinct IACUCPROTOCOLHEADERPER_OID) from \
 (\
@@ -35,35 +62,25 @@ and trunc(statusCodeDate) >= to_date('04/01/2015', 'MM/DD/yyyy') \
 and trunc(statusCodeDate) < to_date('07/01/2015', 'MM/DD/yyyy') \
 ) S1 order by IACUCPROTOCOLHEADERPER_OID"
 
-SQL_APPROVAL_ID_DATE = "select IACUCPROTOCOLHEADERPER_OID, STATUSCODEDATE from IACUCPROTOCOLSTATUS \
-where statuscode='Approve' and IACUCPROTOCOLHEADERPER_OID in (\
-    select IACUCPROTOCOLHEADERPER_OID from IACUCPROTOCOLSTATUS\
-    where statuscode='Submit'\
-                     and trunc(statusCodeDate) >= to_date('04/01/2015', 'MM/DD/yyyy')\
-                     and trunc(statusCodeDate) < to_date('07/01/2015', 'MM/DD/yyyy')\
-)\
-and trunc(statusCodeDate) >= to_date('04/01/2015', 'MM/DD/yyyy') \
-and trunc(statusCodeDate) < to_date('07/01/2015', 'MM/DD/yyyy') \
-order by IACUCPROTOCOLHEADERPER_OID"
 
-SQL_ID_SUBMIT_DATE="select IACUCPROTOCOLHEADERPER_OID, STATUSCODEDATE from IACUCPROTOCOLSTATUS \
-where statuscode='Submit'\
-and trunc(statusCodeDate) >= to_date('04/01/2015', 'MM/DD/yyyy') \
-and trunc(statusCodeDate) < to_date('07/01/2015', 'MM/DD/yyyy') \
-and IACUCPROTOCOLHEADERPER_OID in (\
-    select distinct IACUCPROTOCOLHEADERPER_OID from (\
-    select STATUSCODE, IACUCPROTOCOLHEADERPER_OID, STATUSCODEDATE from IACUCPROTOCOLSTATUS\
-    where statuscode in ('Approve')\
-          and IACUCPROTOCOLHEADERPER_OID in (\
-    select IACUCPROTOCOLHEADERPER_OID from IACUCPROTOCOLSTATUS\
-    where statuscode='Submit'\
-                     and trunc(statusCodeDate) >= to_date('04/01/2015', 'MM/DD/yyyy')\
-                     and trunc(statusCodeDate) < to_date('07/01/2015', 'MM/DD/yyyy')\
-)\
-and trunc(statusCodeDate) >= to_date('04/01/2015', 'MM/DD/yyyy')\
-    and trunc(statusCodeDate) < to_date('07/01/2015', 'MM/DD/yyyy')\
-)\
-) order by IACUCPROTOCOLSTATUS.IACUCPROTOCOLHEADERPER_OID"
+SQL_APPROVAL_ID_DATE = "\
+select * from (\
+  select IACUCPROTOCOLHEADERPER_OID, STATUSCODEDATE, ROW_NUMBER () OVER \
+    (PARTITION BY IACUCPROTOCOLHEADERPER_OID ORDER BY STATUSCODEDATE DESC) rn from\
+    (\
+      select IACUCPROTOCOLHEADERPER_OID, STATUSCODEDATE from IACUCPROTOCOLSTATUS\
+        where statuscode='Approve' and IACUCPROTOCOLHEADERPER_OID in\
+          (\
+           select distinct IACUCPROTOCOLHEADERPER_OID from IACUCPROTOCOLSTATUS\
+           where statuscode='Submit'\
+             and trunc(statusCodeDate) >= trunc(to_date('04/01/2015', 'MM/DD/yyyy'))\
+             and trunc(statusCodeDate) <  trunc(to_date('07/01/2015', 'MM/DD/yyyy'))\
+          )\
+          and trunc(statusCodeDate) >= trunc(to_date('04/01/2015', 'MM/DD/yyyy'))\
+          and trunc(statusCodeDate) <  trunc(to_date('07/01/2015', 'MM/DD/yyyy'))\
+    )\
+) where rn = 1"
+
 
 
 def get_total_approval_count():
@@ -94,18 +111,12 @@ def get_header_id_date():
     cursor.close()
     return oid_date
 
-def get_header_id_submit_date():
+def get_id_submission_date():
     cursor = db_connector.DBConnector.cursor()
-    cursor.execute(SQL_ID_SUBMIT_DATE)
+    cursor.execute(SQL_FIRST_SUBMISSION_ID_DATE)
     oid_date = {}
     for res in cursor:
-        oid, submit_date = res[0], res[1]
-        if oid not in oid_date:
-            oid_date[oid] = submit_date
-        else:
-            if oid_date[oid] > submit_date:
-                print('oid={}, d1={}, d2={}'.format(oid, oid_date[oid], submit_date))
-                oid_date[oid] = submit_date
+        oid_date[res[0]] = res[1]
     cursor.close()
     return oid_date
 
@@ -136,13 +147,13 @@ def main():
 
     oid_approval_date = get_header_id_date()
     print('number of id_date: {}'.format(len(oid_approval_date)))
-    for key in oid_approval_date.keys():
-        print('{}={}'.format(key, oid_approval_date[key]))
+    # for key in oid_approval_date.keys():
+    #    print('{}={}'.format(key, oid_approval_date[key]))
 
-    oid_submit_date = get_header_id_submit_date();
-    print('--- oid, submit date ---')
-    for key in oid_submit_date.keys():
-        print('{}={}'.format(key, oid_submit_date[key]))
+    oid_submit_date = get_id_submission_date()
+    # print('--- oid, submit date ---')
+    # for key in oid_submit_date.keys():
+    #    print('{}={}'.format(key, oid_submit_date[key]))
 
     print('number of oid_submit_date: {}'.format(len(oid_submit_date)))
 
@@ -151,7 +162,7 @@ def main():
     max_day_oid = None
     for header_id in oid:
         d = oid_approval_date[header_id].date() - oid_submit_date[header_id].date()
-        print('oid={}, days={}'.format(header_id, d.days))
+        # print('oid={}, days={}'.format(header_id, d.days))
         total_days += d.days
         if d.days > max_day:
             max_day = d.days
