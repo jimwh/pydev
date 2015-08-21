@@ -6,6 +6,57 @@ import db_connector
 import jproperties
 
 # --, 'Done')
+
+SQL_ID_AD_SD_DS = "\
+select T1.IACUCPROTOCOLHEADERPER_OID, T1.STATUSCODEDATE approvalDate, T2.STATUSCODEDATE submitDate,\
+trunc(T1.STATUSCODEDATE)-trunc(T2.STATUSCODEDATE) days from\
+(\
+   select * from (\
+      select IACUCPROTOCOLHEADERPER_OID, STATUSCODEDATE, ROW_NUMBER ()\
+        OVER (PARTITION BY IACUCPROTOCOLHEADERPER_OID\
+        ORDER BY STATUSCODEDATE DESC) rn from\
+        (\
+          select IACUCPROTOCOLHEADERPER_OID, STATUSCODEDATE from IACUCPROTOCOLSTATUS\
+            where statuscode='Approve' and IACUCPROTOCOLHEADERPER_OID in\
+              (\
+                select distinct IACUCPROTOCOLHEADERPER_OID from IACUCPROTOCOLSTATUS\
+                  where statuscode='Submit'\
+                     and trunc(statusCodeDate) >= trunc(to_date('04/01/2015', 'MM/DD/yyyy'))\
+                     and trunc(statusCodeDate) <  trunc(to_date('07/01/2015', 'MM/DD/yyyy'))\
+              )\
+              and trunc(statusCodeDate) >= trunc(to_date('04/01/2015', 'MM/DD/yyyy'))\
+              and trunc(statusCodeDate) <  trunc(to_date('07/01/2015', 'MM/DD/yyyy'))\
+        )\
+   ) where rn = 1) T1,\
+  (\
+    select * from (\
+      select IACUCPROTOCOLHEADERPER_OID, STATUSCODEDATE, ROW_NUMBER ()\
+        OVER (PARTITION BY IACUCPROTOCOLHEADERPER_OID\
+        ORDER BY STATUSCODEDATE ASC) rn from\
+        (\
+          select IACUCPROTOCOLHEADERPER_OID, STATUSCODEDATE from IACUCPROTOCOLSTATUS\
+            where statuscode='Submit'\
+              and trunc(statusCodeDate) >= trunc(to_date('04/01/2015', 'MM/DD/yyyy'))\
+              and trunc(statusCodeDate) <  trunc(to_date('07/01/2015', 'MM/DD/yyyy'))\
+              and IACUCPROTOCOLHEADERPER_OID in (\
+                select distinct IACUCPROTOCOLHEADERPER_OID from (\
+                  select STATUSCODE, IACUCPROTOCOLHEADERPER_OID, STATUSCODEDATE from IACUCPROTOCOLSTATUS\
+                    where statuscode in ('Approve')\
+                    and IACUCPROTOCOLHEADERPER_OID in (\
+                      select IACUCPROTOCOLHEADERPER_OID from IACUCPROTOCOLSTATUS\
+                        where statuscode='Submit'\
+                          and trunc(statusCodeDate) >= trunc(to_date('04/01/2015', 'MM/DD/yyyy'))\
+                          and trunc(statusCodeDate) <  trunc(to_date('07/01/2015', 'MM/DD/yyyy'))\
+                    )\
+                    and trunc(statusCodeDate) >= trunc(to_date('04/01/2015', 'MM/DD/yyyy'))\
+                    and trunc(statusCodeDate) <  trunc(to_date('07/01/2015', 'MM/DD/yyyy'))\
+                )\
+              )\
+            )\
+        ) where rn=1) T2 \
+  where T1.IACUCPROTOCOLHEADERPER_OID=T2.IACUCPROTOCOLHEADERPER_OID order by days"
+
+
 # first submission id and date between April and July
 SQL_FIRST_SUBMISSION_ID_DATE = "\
 select * from (\
@@ -82,7 +133,6 @@ select * from (\
 ) where rn = 1"
 
 
-
 def get_total_approval_count():
     cursor = db_connector.DBConnector.cursor()
     cursor.execute(SQL_APPROVAL_COUNT)
@@ -102,23 +152,23 @@ def get_header_id():
     cursor.close()
     return header_id
 
-def get_header_id_date():
+def get_id_date(sql_state):
     cursor = db_connector.DBConnector.cursor()
-    cursor.execute(SQL_APPROVAL_ID_DATE)
+    cursor.execute(sql_state)
     oid_date = {}
     for res in cursor:
         oid_date[res[0]] = res[1]
     cursor.close()
     return oid_date
 
-def get_id_submission_date():
+def get_id_adate_sdate_days():
     cursor = db_connector.DBConnector.cursor()
-    cursor.execute(SQL_FIRST_SUBMISSION_ID_DATE)
-    oid_date = {}
+    cursor.execute(SQL_ID_AD_SD_DS)
+    data_list = []
     for res in cursor:
-        oid_date[res[0]] = res[1]
+        data_list.append(res)
     cursor.close()
-    return oid_date
+    return data_list
 
 def open_db():
     prop = jproperties.Properties()
@@ -145,16 +195,15 @@ def main():
     oid = get_header_id()
     print('number of header id: {}'.format(len(oid)))
 
-    oid_approval_date = get_header_id_date()
-    print('number of id_date: {}'.format(len(oid_approval_date)))
+    oid_approval_date = get_id_date(SQL_APPROVAL_ID_DATE)
+    print('number of oid_approval_date: {}'.format(len(oid_approval_date)))
     # for key in oid_approval_date.keys():
     #    print('{}={}'.format(key, oid_approval_date[key]))
 
-    oid_submit_date = get_id_submission_date()
+    oid_submit_date = get_id_date(SQL_FIRST_SUBMISSION_ID_DATE)
     # print('--- oid, submit date ---')
     # for key in oid_submit_date.keys():
     #    print('{}={}'.format(key, oid_submit_date[key]))
-
     print('number of oid_submit_date: {}'.format(len(oid_submit_date)))
 
     total_days = 0
@@ -167,6 +216,10 @@ def main():
         if d.days > max_day:
             max_day = d.days
             max_day_oid = header_id
+
+    data_list = get_id_adate_sdate_days()
+    for data in data_list:
+        print(data)
     close_db()
     print('avg={}, max days: {}, oid={}'.format(total_days/412, max_day, max_day_oid))
     return 0
