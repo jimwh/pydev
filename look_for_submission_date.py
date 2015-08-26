@@ -7,10 +7,16 @@ import jproperties
 
 
 SQL_APPROVAL_ID_DATE = "\
-  select IACUCPROTOCOLHEADERPER_OID, STATUSCODEDATE from IACUCPROTOCOLSTATUS\
-  where trunc(statusCodeDate) between\
-             trunc(to_date('04/01/2015', 'MM/DD/yyyy'))\
-        and  trunc(to_date('06/30/2015', 'MM/DD/yyyy'))"
+  select IACUCPROTOCOLHEADERPER_OID, STATUSCODEDATE from IACUCPROTOCOLSTATUS \
+  where trunc(statusCodeDate) \
+  between trunc(to_date('04/01/2015', 'MM/DD/yyyy')) and  trunc(to_date('06/30/2015', 'MM/DD/yyyy')) \
+  and statusCode='Done'"
+
+SQL_STATUS_BY_ID = "\
+  select STATUSCODE, STATUSCODEDATE from IACUCPROTOCOLSTATUS \
+  where IACUCPROTOCOLHEADERPER_OID = :header_id \
+  and statusCode<>'Create'\
+  order by STATUSCODEDATE desc"
 
 def get_approval_id_date():
     cursor = db_connector.DBConnector.cursor()
@@ -34,14 +40,53 @@ def open_db():
 def close_db():
     db_connector.DBConnector.close()
 
+def get_submission_date(header_id):
+
+    cursor = db_connector.DBConnector.cursor()
+    cursor.prepare(SQL_STATUS_BY_ID)
+    cursor.execute(None, {'header_id': header_id})
+
+    submission_date = None
+    """
+    for res in cursor:
+        print(res)
+        if res[0] == 'Submit':
+            print('submission row: {}'.format(res[1]))
+            submission_date = res[1]
+            cursor.close()
+            return submission_date
+    """
+    res_list = []
+    for res in cursor:
+        res_list.append(res)
+    cursor.close()
+    for data in res_list:
+        print(data)
+
+    return submission_date
+
+def get_approval_id_submission_date(header_id_list):
+    id_date = {}
+    for header_id in header_id_list:
+        print('header_id={}'.format(header_id))
+        submission_date = get_submission_date(header_id)
+        if submission_date is not None:
+            id_date[header_id] = submission_date
+
+    return id_date
 
 def main():
     if open_db() is not True:
         return 1
 
     approval_id_date = get_approval_id_date()
-    for data in approval_id_date:
-        print(data)
+    print('num of approvals: {}'.format(len(approval_id_date)))
+    id_submission_date = get_approval_id_submission_date(approval_id_date.keys())
+    """
+    for key in approval_id_date.keys():
+        dd = approval_id_date[key].date() - id_submission_date[key].date()
+        print('key={}, d1={}, d2={}, days={}'.format(key, approval_id_date[key], id_submission_date[key], dd.days))
+    """
     close_db()
     return 0
 
