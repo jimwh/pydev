@@ -5,7 +5,6 @@ import cx_Oracle
 import db_connector
 import jproperties
 
-
 SQL_APPROVAL_ID_DATE = "\
   select IACUCPROTOCOLHEADERPER_OID, STATUSCODEDATE from IACUCPROTOCOLSTATUS \
   where trunc(statusCodeDate) \
@@ -15,8 +14,8 @@ SQL_APPROVAL_ID_DATE = "\
 SQL_STATUS_BY_ID = "\
   select STATUSCODE, STATUSCODEDATE from IACUCPROTOCOLSTATUS \
   where IACUCPROTOCOLHEADERPER_OID = :header_id \
-  and statusCode<>'Create'\
-  order by STATUSCODEDATE desc"
+  and statusCode not in('Create', 'Done')\
+  order by STATUSCODEDATE asc"
 
 def get_approval_id_date():
     cursor = db_connector.DBConnector.cursor()
@@ -47,28 +46,19 @@ def get_submission_date(header_id):
     cursor.execute(None, {'header_id': header_id})
 
     submission_date = None
-    """
     for res in cursor:
-        print(res)
+        # print(res)
         if res[0] == 'Submit':
-            print('submission row: {}'.format(res[1]))
             submission_date = res[1]
             cursor.close()
             return submission_date
-    """
-    res_list = []
-    for res in cursor:
-        res_list.append(res)
-    cursor.close()
-    for data in res_list:
-        print(data)
 
+    cursor.close()
     return submission_date
 
 def get_approval_id_submission_date(header_id_list):
     id_date = {}
     for header_id in header_id_list:
-        print('header_id={}'.format(header_id))
         submission_date = get_submission_date(header_id)
         if submission_date is not None:
             id_date[header_id] = submission_date
@@ -82,12 +72,12 @@ def main():
     approval_id_date = get_approval_id_date()
     print('num of approvals: {}'.format(len(approval_id_date)))
     id_submission_date = get_approval_id_submission_date(approval_id_date.keys())
-    """
+    close_db()
+
     for key in approval_id_date.keys():
         dd = approval_id_date[key].date() - id_submission_date[key].date()
-        print('key={}, d1={}, d2={}, days={}'.format(key, approval_id_date[key], id_submission_date[key], dd.days))
-    """
-    close_db()
+        print('header_id={}, d1={}, d2={}, days={}'.format(key, approval_id_date[key], id_submission_date[key], dd.days))
+
     return 0
 
 if __name__ == '__main__':
