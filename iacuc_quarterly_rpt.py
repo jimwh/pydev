@@ -5,7 +5,31 @@ import cx_Oracle
 import db_connector
 import jproperties
 
-# --, 'Done')
+"""
+select count(P.BUSINESS_KEY_) from ACT_HI_PROCINST P, ACT_HI_TASKINST T
+where P.PROC_INST_ID_ = T.PROC_INST_ID_
+and T.TASK_DEF_KEY_='finalApproval' and T.DELETE_REASON_='completed'
+and trunc(T.END_TIME_) between trunc(to_date('07/01/2015', 'MM/DD/yyyy'))
+and trunc(to_date('08/27/2015', 'MM/DD/yyyy'));
+
+
+select P.BUSINESS_KEY_, T.END_TIME_ from ACT_HI_PROCINST P, ACT_HI_TASKINST T
+where P.PROC_INST_ID_ = T.PROC_INST_ID_
+and T.TASK_DEF_KEY_='submit' and T.DELETE_REASON_='completed'
+and trunc(T.END_TIME_) between trunc(to_date('07/01/2015', 'MM/DD/yyyy'))
+and trunc(to_date('08/01/2015', 'MM/DD/yyyy'));
+
+
+select P.BUSINESS_KEY_, T.END_TIME_
+from ACT_HI_PROCINST P, ACT_HI_TASKINST T
+where P.PROC_INST_ID_ = T.PROC_INST_ID_
+and T.TASK_DEF_KEY_='finalApproval' and T.DELETE_REASON_='completed'
+and trunc(T.END_TIME_) between trunc(to_date('07/01/2015', 'MM/DD/yyyy'))
+and trunc(to_date('08/01/2015', 'MM/DD/yyyy'))
+and P.BUSINESS_KEY_ in (select OID from IacucProtocolHeader where ProtocolYear='1' and modificationNumber='00');
+"""
+
+
 
 SQL_ID_AD_SD_DS = "\
 select T1.IACUCPROTOCOLHEADERPER_OID, T1.STATUSCODEDATE approvalDate, T2.STATUSCODEDATE submitDate,\
