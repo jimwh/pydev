@@ -1,8 +1,8 @@
 #!/usr/bin/python
 
 import sys
-import cx_Oracle
-import db_connector
+
+from iacuc import db_connector
 
 SQL_1 = "select NAME_, BYTEARRAY_ID_ from ACT_HI_DETAIL where TASK_ID_ = :task_id"
 

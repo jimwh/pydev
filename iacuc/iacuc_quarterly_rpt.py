@@ -1,9 +1,8 @@
 #!/usr/bin/python
 
 import sys
-import cx_Oracle
-import db_connector
-import jproperties
+
+from iacuc import db_connector, jproperties
 
 """
 select count(P.BUSINESS_KEY_) from ACT_HI_PROCINST P, ACT_HI_TASKINST T

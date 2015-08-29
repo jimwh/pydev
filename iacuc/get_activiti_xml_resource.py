@@ -1,8 +1,9 @@
 #!/usr/bin/python
 
 import sys
-import cx_Oracle
-import db_connector
+
+from iacuc import db_connector
+
 #
 # local
 # rascal/rascal@127.0.0.1/XE

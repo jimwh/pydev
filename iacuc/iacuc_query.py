@@ -1,8 +1,8 @@
 #!/usr/bin/python
 
 import sys
-import cx_Oracle
-import db_connector
+
+from iacuc import db_connector
 
 sql_protocol_num_list = "select OID, PROTOCOLNUMBER, PROTOCOLYEAR, MODIFICATIONNUMBER from IACUCPROTOCOLHEADER where CURRENTSTATUS='ReturnToPI' order by OID"
 

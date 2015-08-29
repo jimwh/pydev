@@ -1,7 +1,7 @@
 #!/usr/bin/python
 
-import javaobj
-import logging
+from iacuc import javaobj
+
 
 def read_file(filename):
     file = open(filename, 'rb')

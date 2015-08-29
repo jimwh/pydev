@@ -1,9 +1,8 @@
 #!/usr/bin/python
 
 import sys
-import cx_Oracle
-import db_connector
-import jproperties
+
+from iacuc import db_connector, jproperties
 
 SQL_SELECT_STATEMENT = "\
 select distinct 'IRB', p.OID, p.PROTOCOLNUMBER,to_char(h.CREATIONDATE, 'MM/DD/YYYY') \

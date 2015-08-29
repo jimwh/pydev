@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-import db_connector
+from iacuc import db_connector
 
 connector = None
 def test_version():
