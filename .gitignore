@@ -80,7 +80,8 @@ hs_err_pid*
 
 .idea/
 *.iml
-
+*.pdf
+*.txt
 .target/
 .classpath/
 .project/
