@@ -5,6 +5,22 @@ import sys
 import db_connector
 import jproperties
 
+"""
+---------------- active protocol and its snapshot ----------------------------------------------------------
+select H.OID headerId, P.PROTOCOLNUMBER, H.PROTOCOLYEAR, H.MODIFICATIONNUMBER,
+T.ID snapshotId, T.SNAPSHOT,
+S.OID statusId,  IRBAPPROVALDATE, EXPIRATIONDATE, S.STATUSDATE
+from IRBPROTOCOLHEADER H
+join IRBPROTOCOL P on H.PARENTPROTOCOLOID=P.OID
+join IRBSTATUS S on S.PARENTOBJECTOID=H.OID
+join IRBPROTOCOLSNAPSHOT T on T.IRBSTATUSID=S.OID
+where
+H.OID = (select max(OID) from IrbProtocolHeader iph where iph.PARENTPROTOCOLOID = H.PARENTPROTOCOLOID) and
+H.IRBAPPROVALDATE is not null and
+trunc(H.EXPIRATIONDATE) >= trunc(sysdate) and
+S.STATUSNAME='Approved';
+------------------------------------------------------------------------------------------------------------
+"""
 
 SQL_SELECT_BY_PROTOCOL_NUM="\
 select H.OID, P.PROTOCOLNUMBER, H.PROTOCOLYEAR, H.MODIFICATIONNUMBER,\
