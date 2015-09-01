@@ -2,8 +2,8 @@
 
 import sys
 
-import db_connector
-import jproperties
+from db import db_connector
+from db import jproperties
 
 """
 ---------------- active protocol and its snapshot ----------------------------------------------------------
