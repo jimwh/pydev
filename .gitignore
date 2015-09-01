@@ -83,6 +83,7 @@ hs_err_pid*
 *.pdf
 *.txt
 *.swf
+*.docx
 
 .target/
 .classpath/
