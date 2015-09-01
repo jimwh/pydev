@@ -82,6 +82,8 @@ hs_err_pid*
 *.iml
 *.pdf
 *.txt
+*.swf
+
 .target/
 .classpath/
 .project/

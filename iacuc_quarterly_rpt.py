@@ -2,7 +2,8 @@
 
 import sys
 
-from iacuc import db_connector, jproperties
+from db import db_connector
+from db import jproperties
 
 """
 select count(P.BUSINESS_KEY_) from ACT_HI_PROCINST P, ACT_HI_TASKINST T

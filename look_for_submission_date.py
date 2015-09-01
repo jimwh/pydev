@@ -2,7 +2,8 @@
 
 import sys
 
-from iacuc import db_connector, jproperties
+from iacuc import db_connector
+from db import jproperties
 
 SQL_APPROVAL_ID_DATE = "\
   select IACUCPROTOCOLHEADERPER_OID, STATUSCODEDATE from IACUCPROTOCOLSTATUS \

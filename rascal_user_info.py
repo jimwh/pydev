@@ -1,8 +1,9 @@
 #!/usr/bin/python
 
+from db import db_connector
+from db import jproperties
 import sys
 
-from iacuc import db_connector, jproperties
 
 SQL_SELECT_STATEMENT = "\
 select distinct 'IRB', p.OID, p.PROTOCOLNUMBER,to_char(h.CREATIONDATE, 'MM/DD/YYYY') \
@@ -47,7 +48,7 @@ def print_by_rid(rid):
 
 def main():
     prop = jproperties.Properties()
-    prop.load("db.properties")
+    prop.load("../db/db.properties")
     connection_str = prop.get(sys.argv[1])
     if not connection_str:
         print('error: connection string undefined')

@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-from iacuc import javaobj
+from db import javaobj
 
 
 def read_file(filename):
