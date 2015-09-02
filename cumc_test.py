@@ -2,6 +2,7 @@
 
 import os
 import sys
+import zipfile
 import time
 
 from db import db_connector
@@ -107,13 +108,16 @@ def main():
     download_attached_consent_form()
 
     db_connector.DBConnector.close()
-    # time.strftime('%Y%m%d')
-    zip_file_name = "/tmp/rascal_to_cumc_" + time.strftime('%Y%m%d') + ".zip"
-    zip_command = "zip -r " + zip_file_name + " /tmp/cumc/*"
-    if os.system(zip_command) == 0:
-        print('Successful backup to')
-    else:
-        print('Backup FAILED')
+
+    zip_file_name = '/tmp/rascal_to_cumc_' + time.strftime('%Y%m%d') + '.zip'
+    zf = zipfile.ZipFile(zip_file_name, 'w', zipfile.ZIP_DEFLATED)
+    os.chdir("/tmp")
+    for dirname, subdirs, files in os.walk("./cumc"):
+        zf.write(dirname)
+        for filename in files:
+            zf.write(os.path.join(dirname, filename))
+    zf.close()
+
     return 0
 
 if __name__ == '__main__':
