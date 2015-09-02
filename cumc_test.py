@@ -2,6 +2,7 @@
 
 import os
 import sys
+import time
 
 from db import db_connector
 from db import jproperties
@@ -106,6 +107,13 @@ def main():
     download_attached_consent_form()
 
     db_connector.DBConnector.close()
+    # time.strftime('%Y%m%d')
+    zip_file_name = "/tmp/rascal_to_cumc_" + time.strftime('%Y%m%d') + ".zip"
+    zip_command = "zip -r " + zip_file_name + " /tmp/cumc/*"
+    if os.system(zip_command) == 0:
+        print('Successful backup to')
+    else:
+        print('Backup FAILED')
     return 0
 
 if __name__ == '__main__':
