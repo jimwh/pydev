@@ -26,7 +26,7 @@ where\
   A.ARCHIVE='N' and A.ACTIVE='Y' \
   and P.PROTOCOLNUMBER='AAAJ7852'"
 
-SQL_ATTACHED_CONSET_FORM="\
+SQL_ATTACHED_CONSET_FORM = "\
 select H.OID, P.PROTOCOLNUMBER, H.protocolYear, H.modificationnumber,\
 A.FILENAME, A.DOCUMENTDATA, A.DOCUMENTDATASTAMPED, A.DOCUMENTIDENTIFIER\
   from IRBPROTOCOLHEADER H\
@@ -46,7 +46,7 @@ A.FILENAME, A.DOCUMENTDATA, A.DOCUMENTDATASTAMPED, A.DOCUMENTIDENTIFIER\
 
 DIR_NAME = "/tmp/cumc/"
 
-def download_protocol():
+def download_attached_standalone_protocol():
     cursor = db_connector.DBConnector.cursor()
     cursor.execute(SQL_STANDALONE_PROTOCOL)
 
@@ -73,7 +73,7 @@ def download_attached_consent_form():
     for res in cursor:
         protocol_num = '{}_Y{:02}_M{:02}'.format(res[1], res[2], res[3])
         print(protocol_num)
-        dir_name = DIR_NAME + '/' + protocol_num + '/ATTACHED_CONSENT_FORM'
+        dir_name = DIR_NAME + '/' + protocol_num + '/ATTACHED_CONSENT_FORMS'
         if not os.path.exists(dir_name):
             os.makedirs(dir_name)
 
@@ -95,6 +95,17 @@ def dump_to_file(file_name, blob_data):
         print('i/o error... {}'.format(file_name))
 
 
+def zip_stuff():
+    zip_file_name = '/tmp/rascal_to_cumc_' + time.strftime('%Y%m%d') + '.zip'
+    zf = zipfile.ZipFile(zip_file_name, 'w', zipfile.ZIP_DEFLATED)
+    os.chdir("/tmp")
+    for dirname, subdirs, files in os.walk("./cumc"):
+        zf.write(dirname)
+        for filename in files:
+            zf.write(os.path.join(dirname, filename))
+    zf.close()
+
+
 def main():
     prop = jproperties.Properties()
     prop.load("./db/db.properties")
@@ -104,19 +115,12 @@ def main():
         return 1
     db_connector.DBConnector(connection_str)
 
-    download_protocol()
+    download_attached_standalone_protocol()
     download_attached_consent_form()
 
     db_connector.DBConnector.close()
 
-    zip_file_name = '/tmp/rascal_to_cumc_' + time.strftime('%Y%m%d') + '.zip'
-    zf = zipfile.ZipFile(zip_file_name, 'w', zipfile.ZIP_DEFLATED)
-    os.chdir("/tmp")
-    for dirname, subdirs, files in os.walk("./cumc"):
-        zf.write(dirname)
-        for filename in files:
-            zf.write(os.path.join(dirname, filename))
-    zf.close()
+    zip_stuff()
 
     return 0
 
