@@ -1,6 +1,5 @@
 #!/usr/bin/python
 
-import os
 import sys
 import cx_Oracle
 
@@ -13,24 +12,21 @@ SQL_INSERT_BLOB = "insert into foobar(id, filename, content) values(:1, :2, :3)"
 SQL_UPDATE_BLOB = "update foobar set content = :1 where id=1 and filename='foome'"
 
 def insert_blob():
-    binary_data = read_file()
-
+    data = read_file()
     cursor = db_connector.DBConnector.cursor()
-
-    binary_var = cursor.var(cx_Oracle.BLOB)
-    binary_var.setvalue(0, binary_data)
-    cursor.execute(SQL_INSERT_BLOB, [1, 'foome', binary_var])
-    # cursor.execute(SQL_INSERT_BLOB, [1, 'foome', '/home/jh3389/Downloads', 'PastedGraphic-1.tiff'])
+    blob_var = cursor.var(cx_Oracle.BLOB)
+    blob_var.setvalue(0, data)
+    cursor.execute(SQL_INSERT_BLOB, [1, 'foome', blob_var])
     db_connector.DBConnector.commit()
     cursor.close
 
 
 def update_blob():
-    binary_data = read_file()
+    data = read_file()
     cursor = db_connector.DBConnector.cursor()
-    binary_var = cursor.var(cx_Oracle.BLOB)
-    binary_var.setvalue(0, binary_data)
-    cursor.execute(SQL_UPDATE_BLOB, [binary_var])
+    blob_var = cursor.var(cx_Oracle.BLOB)
+    blob_var.setvalue(0, data)
+    cursor.execute(SQL_UPDATE_BLOB, [blob_var])
     db_connector.DBConnector.commit()
     cursor.close
 
@@ -75,7 +71,7 @@ def main():
         return 1
     db_connector.DBConnector(connection_str)
 
-    ### insert_blob()
+    # insert_blob()
     update_blob()
     download_blob()
 
