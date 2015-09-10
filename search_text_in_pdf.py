@@ -1,5 +1,6 @@
 #!/usr/bin/python
 
+import re
 from cStringIO import StringIO
 from pdfminer.pdfinterp import PDFResourceManager, PDFPageInterpreter
 from pdfminer.converter import TextConverter
@@ -29,8 +30,11 @@ def convert(fname, pages=None):
 
 def main():
 
-    text = convert('/home/jh3389/dev/learnpy/pydev/foome.pdf');
-    print(text)
+    text = convert('/home/jh3389/Downloads/19317668.pdf')
+    if re.search('following', text):
+        print(text)
+    else:
+        print('not found')
 
 if __name__ == '__main__':
     main()
