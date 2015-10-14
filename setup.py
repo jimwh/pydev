@@ -22,5 +22,5 @@ setup(
             "Development Status :: 3 - Alpha",
             "License :: OSI Approved :: Apache Software License",
             "Topic :: Software Development :: Libraries :: Python Modules",
-            ],
-    )
+            ], requires=['cx_Oracle']
+)

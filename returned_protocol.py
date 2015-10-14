@@ -2,7 +2,8 @@
 
 import sys
 
-from iacuc import db_connector
+from db import db_connector
+from db import jproperties
 
 sql_protocol_num_list = "select OID, PROTOCOLNUMBER, PROTOCOLYEAR, MODIFICATIONNUMBER from IACUCPROTOCOLHEADER where CURRENTSTATUS='ReturnToPI' order by OID"
 
@@ -21,6 +22,7 @@ where ROWNUM=1"
 sql_update_kaput = "update ACT_HI_TASKINST set TASK_DEF_KEY_='returnToPI', NAME_='Return to PI' \
 where ID_= :task_id and TASK_DEF_KEY_='kaput'"
 
+
 def update_kaput(task_id):
     print("kaput task_id: %s" % task_id)
     cursor = db_connector.DBConnector.cursor()
@@ -28,6 +30,7 @@ def update_kaput(task_id):
     cursor.execute(None, {'task_id': task_id})
     db_connector.DBConnector.commit()
     cursor.close
+
 
 def get_task_id(bizkey):
     print('bizkey=%s' % bizkey)
@@ -48,6 +51,7 @@ def get_protocol_list():
     cursor.close()
     return protocol_dict
 
+
 def get_end_time(bizkey):
     cursor = db_connector.DBConnector.cursor()
     cursor.prepare(sql_end_time)
@@ -55,6 +59,7 @@ def get_end_time(bizkey):
     res = cursor.fetchone()
     cursor.close
     return res[0]
+
 
 def get_returned_numbers():
     protocol_dict = get_protocol_list()
@@ -75,12 +80,16 @@ def get_returned_numbers():
             print("no end_time for OID=%s, PROTOCOLNUMBER=%s" % (key, item[0]))
     return item_dict, not_found_list
 
+
 def main():
-    if len(sys.argv) != 2:
+    prop = jproperties.Properties()
+    prop.load("./db/db.properties")
+    connection_str = prop.get(sys.argv[1])
+    if not connection_str:
         print('usage: %s <connection string>' % sys.argv[0])
         sys.exit(1)
 
-    db_connector.DBConnector(sys.argv[1])
+    db_connector.DBConnector(connection_str)
 
     protocol_dict, not_found_list = get_returned_numbers()
     print("final list of number of returned protocols: %s" % (len(protocol_dict)))
@@ -89,7 +98,7 @@ def main():
     for oid in not_found_list:
         task_id = get_task_id(oid)
         print('task_id=%s' % task_id)
-        ### update_kaput(task_id)
+        # update_kaput(task_id)
 
     db_connector.DBConnector.close()
     sys.exit(0)

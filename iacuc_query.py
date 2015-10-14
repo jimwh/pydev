@@ -38,6 +38,7 @@ def get_protocol_list():
     cursor.close()
     return protocol_dict
 
+
 def get_end_time(bizkey):
     cursor = db_connector.DBConnector.cursor()
     cursor.prepare(sql_end_time)
@@ -45,6 +46,7 @@ def get_end_time(bizkey):
     res = cursor.fetchone()
     cursor.close
     return res[0]
+
 
 def get_returned_numbers():
     protocol_dict = get_protocol_list()
@@ -64,6 +66,7 @@ def get_returned_numbers():
             not_found_list.append(key)
             print("no end_time for OID=%s, PROTOCOLNUMBER=%s" % (key, item[0]))
     return item_dict, not_found_list
+
 
 def main():
     if len(sys.argv) != 2:

@@ -72,6 +72,7 @@ def main():
     if not connection_str:
         print('error: connection string undefined')
         return 1
+
     db_connector.DBConnector(connection_str)
     protocol = protocol_info()
     print(protocol)

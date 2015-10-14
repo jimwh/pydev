@@ -2,6 +2,7 @@
 
 import cx_Oracle
 
+
 class DBConnector:
     instance = None
 
@@ -56,8 +57,10 @@ class DBConnector:
     def commit(cls):
         return DBConnector.instance.commit()
 
+
 def version():
     print(DBConnector.version())
+
 
 def what_time():
     cur = DBConnector.cursor()
@@ -65,6 +68,7 @@ def what_time():
     row = cur.fetchone()
     print(row)
     cur.close()
+
 
 def binding_test():
     cur = DBConnector.cursor()
@@ -84,6 +88,7 @@ def update():
     cur.execute(None, {'id': 'abc'})
     cur.close()
     DBConnector.commit()
+
 
 def main():
     DBConnector("rascal/rascal@127.0.0.1/XE")
