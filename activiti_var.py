@@ -19,9 +19,11 @@ def begin_print_var(task_id):
     cursor.close()
     loop_var(name_byte_array_id)
 
+
 def loop_var(name_id):
     for name, ba_id in name_id:
         print_var(name, ba_id)
+
 
 def print_var(name, byte_array_id):
     cursor = db_connector.DBConnector.cursor()
@@ -35,6 +37,7 @@ def print_var(name, byte_array_id):
         file.write(blob_data.read())
         file.close()
     cursor.close
+
 
 def main():
     if len(sys.argv) != 3:

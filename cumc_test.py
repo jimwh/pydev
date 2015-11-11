@@ -26,6 +26,10 @@ where\
   A.ARCHIVE='N' and A.ACTIVE='Y' \
   and P.PROTOCOLNUMBER='AAAJ7852'"
 
+SQL_ATTACHED_CONSET_FORM = "select * from RASCAL_CUMC_DOCUMENT order by protocolnumber"
+# where DOCUMENTTYPE='RascalConsent'"
+
+'''
 SQL_ATTACHED_CONSET_FORM = "\
 select H.OID, P.PROTOCOLNUMBER, H.protocolYear, H.modificationnumber,\
 A.FILENAME, A.DOCUMENTDATA, A.DOCUMENTDATASTAMPED, A.DOCUMENTIDENTIFIER\
@@ -43,6 +47,7 @@ A.FILENAME, A.DOCUMENTDATA, A.DOCUMENTDATASTAMPED, A.DOCUMENTIDENTIFIER\
   A.ARCHIVE='N' and A.ACTIVE='Y' and\
   A.ATTACHMENTTYPECODE in (2, 3, 10, 26)\
   and P.PROTOCOLNUMBER='AAAK5904'"
+'''
 
 DIR_NAME = "/tmp/cumc/"
 
@@ -66,25 +71,25 @@ def download_attached_standalone_protocol():
 
     cursor.close
 
+
 def download_attached_consent_form():
     cursor = db_connector.DBConnector.cursor()
     cursor.execute(SQL_ATTACHED_CONSET_FORM)
 
     for res in cursor:
-        protocol_num = '{}_Y{:02}_M{:02}'.format(res[1], res[2], res[3])
+        protocol_num = res[1]
         print(protocol_num)
         dir_name = DIR_NAME + '/' + protocol_num + '/ATTACHED_CONSENT_FORMS'
         if not os.path.exists(dir_name):
             os.makedirs(dir_name)
 
-        file_name = dir_name + '/' + res[4]
+        file_name = dir_name + '/' + res[3]
 
-        if res[6] is not None:
-            dump_to_file(file_name, res[6])
-        else:
+        if res[5] is not None:
             dump_to_file(file_name, res[5])
 
     cursor.close
+
 
 def dump_to_file(file_name, blob_data):
     try:
@@ -115,7 +120,7 @@ def main():
         return 1
     db_connector.DBConnector(connection_str)
 
-    download_attached_standalone_protocol()
+    # download_attached_standalone_protocol()
     download_attached_consent_form()
 
     db_connector.DBConnector.close()

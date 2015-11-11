@@ -84,16 +84,15 @@ def get_returned_numbers():
 def main():
     prop = jproperties.Properties()
     prop.load("./db/db.properties")
-    connection_str = prop.get(sys.argv[1])
-    if not connection_str:
-        print('usage: %s <connection string>' % sys.argv[0])
+    if len(sys.argv) == 1:
+        print('Usage: %s <connection string>' % sys.argv[0])
         sys.exit(1)
 
+    connection_str = prop.get(sys.argv[1])
     db_connector.DBConnector(connection_str)
 
     protocol_dict, not_found_list = get_returned_numbers()
     print("final list of number of returned protocols: %s" % (len(protocol_dict)))
-
     print("not found list: %s" % len(not_found_list))
     for oid in not_found_list:
         task_id = get_task_id(oid)
