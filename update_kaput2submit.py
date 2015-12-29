@@ -13,7 +13,7 @@ SQL_TASK_ID = "select HT.ID_\
   and HT.DELETE_REASON_='completed'\
   and S.IACUCPROTOCOLHEADERPER_OID = HP.BUSINESS_KEY_\
   and S.STATUSCODEDATE = HT.END_TIME_\
-  and trunc(S.STATUSCODEDATE) >= trunc(to_date('01/01/2015', 'MM/DD/YYYY'))\
+  and trunc(S.STATUSCODEDATE) >= trunc(to_date('01/01/2014', 'MM/DD/YYYY'))\
   and S.STATUSCODE='Submit'\
   order by HT.ID_ desc"
 
@@ -57,9 +57,9 @@ def main():
     task_id_list = get_task_id()
     print("listSize=%d" % len(task_id_list))
 
-    #for task_id in task_id_list:
-        #print("id=%s" % task_id)
-        # update_kaput2submit(task_id)
+    for task_id in task_id_list:
+        print("id=%s" % task_id)
+        update_kaput2submit(task_id)
 
     db_connector.DBConnector.close()
     sys.exit(0)
