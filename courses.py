@@ -1,23 +1,16 @@
 #!/usr/bin/python
 
-"""
-Change extension
-for file in *.PNG; do mv "$file" "${file%.PNG}.png"; done
-Resize png files
-for file in Slide*.png; do convert $file -resize 800x600 $file; done
-"""
-
 import os
 import sys
-import re
-import glob
 import shutil
 import string
 import Image
+import re
 
-FILE_REGEX = "[Ss]lide*.[pP][nN][gG]"
+
+IMG_FILE_NAME_PATTERN = "[Ss]lide[0-9]+.png$|[Ii]mg[0-9]+.[Pp][Nn][Gg]$"
 HTML_EXTENSION = ".html"
-TEMPLATE_FILE_PATH = "/home/gd2398/development/rascal/course_updates/templateFiles/"
+DST_FILE_PATH = "/tmp/tc"
 
 
 def atoi(text):
@@ -34,6 +27,7 @@ def natural_keys(text):
 
 
 def copytree(src, dst, symlinks=False, ignore=None):
+    print(dst)
     if not os.path.exists(dst):
         os.makedirs(dst)
     for item in os.listdir(src):
@@ -46,30 +40,24 @@ def copytree(src, dst, symlinks=False, ignore=None):
                 shutil.copy2(s, d)
 
 
-def rename_files(path):
-    slide_img = glob.glob(FILE_REGEX)
-    if len(slide_img) == 0:
-        print("no img files in the path: %s" % path)
-        sys.exit(1)
-
+def rename_files(slide_img):
     for slide in slide_img:
         (name, ext) = os.path.splitext(slide)
         os.rename(slide, name + ext.lower())
 
 
-def resize_images():
+def resize_images(files):
     width = 800
     height = 600
 
-    for imageName in glob.glob(FILE_REGEX):
-        image = Image.open(imageName)
-        image.resize((width, height), Image.ANTIALIAS)
-        image.save(imageName)
+    for img_name in files:
+        print(img_name)
+        image = Image.open(img_name)
+        new_img = image.resize((width, height), Image.ANTIALIAS)
+        new_img.save(img_name)
 
 
-def create_html_files():
-    # load slides from current directory and sort numerically
-    files = sorted(glob.glob(FILE_REGEX), key=natural_keys)
+def create_html_files(files):
 
     for f in files:
         isFirst = files.index(f) == 0
@@ -127,14 +115,23 @@ def create_html_files():
 
 
 def execute(path):
-    rename_files(path)
-    # resizeImages()
-    #create_html_files()()
-    #copytree(TEMPLATE_FILE_PATH, os.getcwd())
+    results = get_img_file_name_list(path, IMG_FILE_NAME_PATTERN)
+    files = sorted(results, key=natural_keys)
+    rename_files(files)
+    resize_images(files)
+    create_html_files(files)
+    copytree(path, DST_FILE_PATH)
 
+
+def get_img_file_name_list(path, exp):
+    m = re.compile(exp)
+    res = [f for f in os.listdir(path) if m.search(f)]
+    res = map(lambda x: "%s/%s" % (path, x, ), res)
+    return res
 
 if __name__ == '__main__':
     if len(sys.argv) != 2:
-        print('usage: {} <img file path>'.format(sys.argv[0]))
+        print('usage: {} <src img file path>'.format(sys.argv[0]))
         sys.exit(1)
+
     sys.exit(execute(sys.argv[1]))
