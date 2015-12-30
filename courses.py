@@ -7,23 +7,14 @@ import string
 import Image
 import re
 
-
 IMG_FILE_NAME_PATTERN = "[Ss]lide[0-9]+.png$|[Ii]mg[0-9]+.[Pp][Nn][Gg]$"
 HTML_EXTENSION = ".html"
 DST_FILE_PATH = "/tmp/tc"
 
 
-def atoi(text):
-    return int(text) if text.isdigit() else text
-
-
-def natural_keys(text):
-    """
-    alist.sort(key=natural_keys) sorts in human order
-    http://nedbatchelder.com/blog/200712/human_sorting.html
-    (See Toothy's implementation in the comments)
-    """
-    return [atoi(c) for c in re.split('(\d+)', text)]
+def natural_keys(s):
+    return tuple(int(part) if re.match(r'[0-9]+$', part) else part
+                 for part in re.split(r'([0-9]+)', s))
 
 
 def copytree(src, dst, symlinks=False, ignore=None):
@@ -56,23 +47,22 @@ def resize_images(files):
 
 
 def create_html_files(files):
-
     for f in files:
-        isFirst = files.index(f) == 0
-        isLast = files[-1] == f
-        imageName, imageExtension = os.path.splitext(f)
+        is_first = files.index(f) == 0
+        is_last = files[-1] == f
+        img_name, img_ext = os.path.splitext(f)
 
-        firstPage = "#" if isFirst else files[0].replace(imageExtension, HTML_EXTENSION)
-        firstImage = "first-inactive.png" if isFirst else "first.png"
+        first_page = "#" if is_first else files[0].replace(img_ext, HTML_EXTENSION)
+        first_img = "first-inactive.png" if is_first else "first.png"
 
-        leftPage = "#" if isFirst else files[files.index(f) - 1].replace(imageExtension, HTML_EXTENSION)
-        leftImage = "left-inactive.png" if isFirst else "left.png"
+        left_page = "#" if is_first else files[files.index(f) - 1].replace(img_ext, HTML_EXTENSION)
+        left_img = "left-inactive.png" if is_first else "left.png"
 
-        lastPage = "#" if isLast else files[-1].replace(imageExtension, HTML_EXTENSION)
-        lastImage = "last-inactive.png" if isLast else "last.png"
+        last_page = "#" if is_last else files[-1].replace(img_ext, HTML_EXTENSION)
+        last_img = "last-inactive.png" if is_last else "last.png"
 
-        rightPage = "#" if isLast else files[files.index(f) + 1].replace(imageExtension, HTML_EXTENSION)
-        rightImage = "right-inactive.png" if isLast else "right.png"
+        right_page = "#" if is_last else files[files.index(f) + 1].replace(img_ext, HTML_EXTENSION)
+        right_img = "right-inactive.png" if is_last else "right.png"
 
         htmlText = string.Template("""
     <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
@@ -96,17 +86,17 @@ def create_html_files(files):
     </html>
     """)
         html_text = htmlText.safe_substitute(slide=f,
-                                            firstPage=firstPage,
-                                            firstImage=firstImage,
-                                            leftPage=leftPage,
-                                            leftImage=leftImage,
-                                            lastPage=lastPage,
-                                            lastImage=lastImage,
-                                            rightPage=rightPage,
-                                            rightImage=rightImage,
-                                            homePage=files[0].replace(imageExtension, HTML_EXTENSION))
+                                             first_page=first_page,
+                                             first_img=first_img,
+                                             left_page=left_page,
+                                             left_img=left_img,
+                                             last_page=last_page,
+                                             last_img=last_img,
+                                             right_page=right_page,
+                                             right_img=right_img,
+                                             home_page=files[0].replace(img_ext, HTML_EXTENSION))
 
-        html_file_name = f.replace(imageExtension, HTML_EXTENSION)
+        html_file_name = f.replace(img_ext, HTML_EXTENSION)
         file_handle = open(html_file_name, "w")
         file_handle.write(html_text)
         file_handle.close()
@@ -124,8 +114,9 @@ def execute(path):
 def get_img_file_name_list(path, exp):
     m = re.compile(exp)
     res = [f for f in os.listdir(path) if m.search(f)]
-    res = map(lambda x: "%s/%s" % (path, x, ), res)
+    res = map(lambda x: "%s/%s" % (path, x,), res)
     return res
+
 
 if __name__ == '__main__':
     if len(sys.argv) != 2:
