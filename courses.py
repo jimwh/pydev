@@ -27,7 +27,6 @@ def natural_keys(text):
 
 
 def copytree(src, dst, symlinks=False, ignore=None):
-    print(dst)
     if not os.path.exists(dst):
         os.makedirs(dst)
     for item in os.listdir(src):
@@ -51,7 +50,6 @@ def resize_images(files):
     height = 600
 
     for img_name in files:
-        print(img_name)
         image = Image.open(img_name)
         new_img = image.resize((width, height), Image.ANTIALIAS)
         new_img.save(img_name)
