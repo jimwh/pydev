@@ -39,28 +39,32 @@ def natural_keys(s):
                  for part in re.split(r'([0-9]+)', s))
 
 
-def get_img_file_name_list(path, exp):
-    if not os.path.exists(path):
-        print("no such directory: %s" % path)
+def get_src_img_names(src_dir, exp):
+    if not os.path.exists(src_dir):
+        print("no such directory: %s" % src_dir)
         sys.exit(1)
 
     m = re.compile(exp)
-    res = [f for f in os.listdir(path) if m.search(f)]
-    res = map(lambda x: "%s/%s" % (path, x,), res)
+    res = [f for f in os.listdir(src_dir) if m.search(f)]
+    res = map(lambda x: "%s/%s" % (src_dir, x,), res)
     return sorted(res, key=natural_keys)
-    # return res
 
 
-def rename_files(slide_img):
-    for slide in slide_img:
-        (name, ext) = os.path.splitext(slide)
-        os.rename(slide, name + ext.lower())
+def rename_files(src_slide, dest_dir):
+    dest_file_list = []
+    for slide in src_slide:
+        shutil.copy2(slide, dest_dir)
+        base_name = os.path.basename(slide)
+        dest_file = dest_dir + "/" + base_name
+        dest_file_list.append(dest_file)
+        (name, ext) = os.path.splitext(dest_file)
+        os.rename(dest_file, name + ext.lower())
+    return dest_file_list
 
 
 def resize_images(files):
     width = 800
     height = 600
-
     for img_name in files:
         image = Image.open(img_name)
         new_img = image.resize((width, height), Image.ANTIALIAS)
@@ -106,26 +110,24 @@ def create_html_files(files, dest_dir):
         file_handle.close()
 
 
-def copy_img_to_dest(file_list, dest):
-    for file in file_list:
-        shutil.copy2(file, dest)
-
-
 def copy_template_dir(src, dest):
     for filename in glob.glob(os.path.join(src, '*.png')):
         shutil.copy(filename, dest)
 
 
-def execute(src_img_path, template_dir, dst_dir):
-    if not os.path.exists(dst_dir):
-        os.makedirs(dst_dir)
+def execute(src_dir, template_dir, dest_dir):
+    if not os.path.exists(dest_dir):
+        os.makedirs(dest_dir)
 
-    file_names = get_img_file_name_list(src_img_path, IMG_FILE_NAME_PATTERN)
-    rename_files(file_names)
-    resize_images(file_names)
-    create_html_files(file_names, dst_dir)
-    copy_img_to_dest(file_names, dst_dir)
-    copy_template_dir(template_dir, dst_dir)
+    src_img_names = get_src_img_names(src_dir, IMG_FILE_NAME_PATTERN)
+
+    dest_file_list = rename_files(src_img_names, dest_dir)
+
+    resize_images(dest_file_list)
+
+    create_html_files(dest_file_list, dest_dir)
+
+    copy_template_dir(template_dir, dest_dir)
 
 
 """
