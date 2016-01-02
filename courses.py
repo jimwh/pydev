@@ -10,7 +10,6 @@ import glob
 
 IMG_FILE_NAME_PATTERN = "[Ss]lide[0-9]+.png$|[Ii]mg[0-9]+.[Pp][Nn][Gg]$"
 HTML_EXTENSION = ".html"
-DST_FILE_PATH = "/tmp/tc"
 TEMPLATE_TEXT = """
     <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
       "http://www.w3.org/TR/html4/transitional.dtd">
@@ -92,20 +91,19 @@ def create_html_files(files, dest_dir):
         html_template_text = string.Template(TEMPLATE_TEXT)
 
         html_text = \
-            html_template_text.safe_substitute(slide=os.path.basename(f),
-                                               first_page=os.path.basename(first_page),
-                                               first_img=os.path.basename(first_img),
-                                               left_page=os.path.basename(left_page),
-                                               left_img=os.path.basename(left_img),
-                                               last_page=os.path.basename(last_page),
-                                               last_img=os.path.basename(last_img),
-                                               right_page=os.path.basename(right_page),
-                                               right_img=os.path.basename(right_img),
-                                               home_page=os.path.basename(files[0].replace(img_ext, HTML_EXTENSION)))
+            html_template_text.safe_substitute(slide=f,
+                                               first_page=first_page,
+                                               first_img=first_img,
+                                               left_page=left_page,
+                                               left_img=left_img,
+                                               last_page=last_page,
+                                               last_img=last_img,
+                                               right_page=right_page,
+                                               right_img=right_img,
+                                               home_page=files[0].replace(img_ext, HTML_EXTENSION))
 
         html_file_name = f.replace(img_ext, HTML_EXTENSION)
-        basename = os.path.basename(html_file_name)
-        file_handle = open(dest_dir + "/" + basename, "w")
+        file_handle = open(dest_dir + "/" + html_file_name, "w")
         file_handle.write(html_text)
         file_handle.close()
 
@@ -124,6 +122,8 @@ def execute(src_dir, template_dir, dest_dir):
     dest_file_list = rename_files(src_img_names, dest_dir)
 
     resize_images(dest_file_list)
+
+    dest_file_list = map(lambda x: os.path.basename(x), dest_file_list)
 
     create_html_files(dest_file_list, dest_dir)
 
