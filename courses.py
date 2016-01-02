@@ -9,7 +9,7 @@ import re
 import glob
 
 IMG_FILE_NAME_PATTERN = "[Ss]lide[0-9]+.png$|[Ii]mg[0-9]+.[Pp][Nn][Gg]$"
-HTML_EXTENSION = ".html"
+HTML_EXT = ".html"
 TEMPLATE_TEXT = """
     <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
       "http://www.w3.org/TR/html4/transitional.dtd">
@@ -76,33 +76,32 @@ def create_html_files(files, dest_dir):
         is_last = files[-1] == f
         img_name, img_ext = os.path.splitext(f)
 
-        first_page = "#" if is_first else files[0].replace(img_ext, HTML_EXTENSION)
+        first_page = "#" if is_first else files[0].replace(img_ext, HTML_EXT)
         first_img = "first-inactive.png" if is_first else "first.png"
 
-        left_page = "#" if is_first else files[files.index(f) - 1].replace(img_ext, HTML_EXTENSION)
+        left_page = "#" if is_first else files[files.index(f) - 1].replace(img_ext, HTML_EXT)
         left_img = "left-inactive.png" if is_first else "left.png"
 
-        last_page = "#" if is_last else files[-1].replace(img_ext, HTML_EXTENSION)
+        last_page = "#" if is_last else files[-1].replace(img_ext, HTML_EXT)
         last_img = "last-inactive.png" if is_last else "last.png"
 
-        right_page = "#" if is_last else files[files.index(f) + 1].replace(img_ext, HTML_EXTENSION)
+        right_page = "#" if is_last else files[files.index(f) + 1].replace(img_ext, HTML_EXT)
         right_img = "right-inactive.png" if is_last else "right.png"
 
-        html_template_text = string.Template(TEMPLATE_TEXT)
+        template = string.Template(TEMPLATE_TEXT)
 
-        html_text = \
-            html_template_text.safe_substitute(slide=f,
-                                               first_page=first_page,
-                                               first_img=first_img,
-                                               left_page=left_page,
-                                               left_img=left_img,
-                                               last_page=last_page,
-                                               last_img=last_img,
-                                               right_page=right_page,
-                                               right_img=right_img,
-                                               home_page=files[0].replace(img_ext, HTML_EXTENSION))
+        html_text = template.safe_substitute(slide=f,
+                                             first_page=first_page,
+                                             first_img=first_img,
+                                             left_page=left_page,
+                                             left_img=left_img,
+                                             last_page=last_page,
+                                             last_img=last_img,
+                                             right_page=right_page,
+                                             right_img=right_img,
+                                             home_page=files[0].replace(img_ext, HTML_EXT))
 
-        html_file_name = f.replace(img_ext, HTML_EXTENSION)
+        html_file_name = f.replace(img_ext, HTML_EXT)
         file_handle = open(dest_dir + "/" + html_file_name, "w")
         file_handle.write(html_text)
         file_handle.close()
@@ -123,23 +122,17 @@ def execute(src_dir, template_dir, dest_dir):
 
     resize_images(dest_file_list)
 
-    dest_file_list = map(lambda x: os.path.basename(x), dest_file_list)
+    base_file_list = map(lambda x: os.path.basename(x), dest_file_list)
 
-    create_html_files(dest_file_list, dest_dir)
+    create_html_files(base_file_list, dest_dir)
 
     copy_template_dir(template_dir, dest_dir)
 
 
-"""
-src img dir - img slides
-template dir - pre defined png etc
-dst - slides, html
-"""
-
 if __name__ == '__main__':
 
     if len(sys.argv) != 4:
-        print('usage: {} <src img dir> <template img dir> <destination file dir>'.format(sys.argv[0]))
+        print('usage: {} <src img dir> <template img dir> <destination dir>'.format(sys.argv[0]))
         sys.exit(1)
 
     sys.exit(execute(sys.argv[1], sys.argv[2], sys.argv[3]))
