@@ -8,7 +8,7 @@ import Image
 import re
 import glob
 
-IMG_FILE_NAME_PATTERN = "[Ss]lide[0-9]+.png$|[Ii]mg[0-9]+.[Pp][Nn][Gg]$"
+IMG_FILE_NAME_PATTERN = "[Ss]lide[0-9]+.png$|[Ii]mg[0-9]+.[Pp][Nn][Gg]$|[Ii]mg[0-9]+.[Jj][Pp][Gg]$"
 HTML_EXT = ".html"
 TEMPLATE_TEXT = """
     <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
@@ -62,12 +62,13 @@ def rename_files(src_slide, dest_dir):
 
 
 def resize_images(files):
-    width = 800
-    height = 600
     for img_name in files:
-        image = Image.open(img_name)
-        new_img = image.resize((width, height), Image.ANTIALIAS)
-        new_img.save(img_name)
+        base_height = 500
+        img = Image.open(img_name)
+        ht_percent = (base_height / float(img.size[1]))
+        wd_size = int((float(img.size[0]) * float(ht_percent)))
+        img = img.resize((wd_size, base_height), Image.ANTIALIAS)
+        img.save(img_name, quality=100)
 
 
 def create_html_files(files, dest_dir):
@@ -117,7 +118,9 @@ def execute(src_dir, template_dir, dest_dir):
         os.makedirs(dest_dir)
 
     src_img_names = get_src_img_names(src_dir, IMG_FILE_NAME_PATTERN)
-
+    if len(src_img_names) == 0:
+        print("no such img files")
+        sys.exit(1)
     dest_file_list = rename_files(src_img_names, dest_dir)
 
     resize_images(dest_file_list)
