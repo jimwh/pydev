@@ -4,9 +4,9 @@ import os
 import sys
 import shutil
 import string
-import Image
 import re
 import glob
+import Image
 
 IMG_FILE_NAME_PATTERN = "[Ss]lide[0-9]+.png$|[Ii]mg[0-9]+.[Pp][Nn][Gg]$|[Ii]mg[0-9]+.[Jj][Pp][Gg]$"
 HTML_EXT = ".html"
