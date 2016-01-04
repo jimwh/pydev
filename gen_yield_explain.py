@@ -30,6 +30,7 @@ import random
 # called again, the state recorded during the yield call is (eventually) discarded.
 #
 
+
 def test_one():
     iterator = (x for x in [9, 31, 42, '08/18/2015'])
     for item in iterator:
@@ -53,6 +54,7 @@ def select_item():
     yield 31
     yield 42
     yield '08/18/2015'
+
 
 def create_generator(const):
     my_list = [1, 3, 9]
@@ -79,6 +81,7 @@ def create_generator(const):
 def get_data():
     return random.sample(range(10), 3)
 
+
 def consume():
     running_sum = 0
     data_items_seen = 0
@@ -96,6 +99,7 @@ def produce(consumer):
         print('produced {}'.format(data))
         consumer.send(data)
         yield
+
 
 def test_two():
     consumer = consume()

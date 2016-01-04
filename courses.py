@@ -122,7 +122,7 @@ def execute(src_dir, template_dir, dest_dir):
 
     resize_images(dest_file_list)
 
-    base_file_list = map(lambda x: os.path.basename(x), dest_file_list)
+    base_file_list = [os.path.basename(x) for x in dest_file_list]
 
     create_html_files(base_file_list, dest_dir)
 
