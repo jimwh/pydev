@@ -8,7 +8,7 @@ import re
 import glob
 import Image
 
-IMG_FILE_NAME_PATTERN = "[Ss]lide[0-9]+.png$|[Ii]mg[0-9]+.[Pp][Nn][Gg]$|[Ii]mg[0-9]+.[Jj][Pp][Gg]$"
+IMG_FILE_NAME_PATTERN = "[Ss]lide[0-9]+.[Pp][Nn][Gg]$|[Ii]mg[0-9]+.[Pp][Nn][Gg]$|[Ii]mg[0-9]+.[Jj][Pp][Gg]$"
 HTML_EXT = ".html"
 TEMPLATE_TEXT = """
     <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
@@ -117,18 +117,28 @@ def execute(src_dir, template_dir, dest_dir):
     if not os.path.exists(dest_dir):
         os.makedirs(dest_dir)
 
+    # get a list of img file name in natural order
+    # and the file with the original path
     src_img_names = get_src_img_names(src_dir, IMG_FILE_NAME_PATTERN)
     if len(src_img_names) == 0:
-        print("no such img files")
+        print("please check name pattern for what kind of img files...")
         sys.exit(1)
+
+    # copy a list of img file from src to destination,
+    # lower case the extension name, and get back the list with destination path
     dest_file_list = rename_files(src_img_names, dest_dir)
 
+    # resize the img file under destination directory
+    # and the original img in src dir untouched
     resize_images(dest_file_list)
 
+    # strip path
     base_file_list = [os.path.basename(x) for x in dest_file_list]
 
+    # the html file will be created under destination directory
     create_html_files(base_file_list, dest_dir)
 
+    # copy predefined img file to that destination directory
     copy_template_dir(template_dir, dest_dir)
 
 
