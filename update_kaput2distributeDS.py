@@ -14,11 +14,11 @@ SQL_TASK_ID = "select HT.ID_\
   and S.IACUCPROTOCOLHEADERPER_OID = HP.BUSINESS_KEY_\
   and S.STATUSCODEDATE = HT.END_TIME_\
   and trunc(S.STATUSCODEDATE) >= trunc(to_date('01/01/2013', 'MM/DD/YYYY'))\
-  and S.STATUSCODE='Submit'\
+  and S.STATUSCODE='Distribute'\
   order by HT.ID_ desc"
 
 SQL_UPDATE = "update ACT_HI_TASKINST\
-    set TASK_DEF_KEY_='submit', NAME_='Submit'\
+    set TASK_DEF_KEY_='distributeToDS', NAME_='Distribute: Designated Reviewers'\
     where ID_= :task_id and TASK_DEF_KEY_='kaput'"
 
 
