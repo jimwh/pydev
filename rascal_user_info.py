@@ -26,6 +26,7 @@ order by 1, OID DESC"
 
 SQL_GET_RID = "select rid from RASCAL_USER where USER_ID= :uni"
 
+
 def get_rid(uni):
     cursor = db_connector.DBConnector.cursor()
     cursor.prepare(SQL_GET_RID)
@@ -38,6 +39,7 @@ def get_rid(uni):
     cursor.close()
     return rid
 
+
 def print_by_rid(rid):
     cursor = db_connector.DBConnector.cursor()
     cursor.prepare(SQL_SELECT_STATEMENT)
@@ -45,6 +47,7 @@ def print_by_rid(rid):
     for res in cursor:
         print(res)
     cursor.close()
+
 
 def main():
     prop = jproperties.Properties()

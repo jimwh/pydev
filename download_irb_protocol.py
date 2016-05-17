@@ -37,6 +37,7 @@ H.IRBAPPROVALDATE is not null and \
 S.STATUSNAME='Approved' and \
 P.PROTOCOLNUMBER= :protocol_num"
 
+
 def download_protocol(protocol_num):
     cursor = db_connector.DBConnector.cursor()
     cursor.prepare(SQL_SELECT_BY_PROTOCOL_NUM)

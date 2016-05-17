@@ -1,29 +1,37 @@
 #!/usr/bin/python3
 
-#import urllib2
-#import httplib2 as http
-import json
-#from urlparse import urlparse
 import requests
-from requests.auth import HTTPBasicAuth
-from requests.auth import HTTPDigestAuth
+import httplib
 
-
-def foologin():
+def login2():
 
     s = requests.Session()
     s.auth = ('user', 'userPass')
-    r = s.post('http://127.0.0.1:8080/login')
+    r = s.post('https://localhost:8443/login', verify=False)
 
     print(r.status_code)
     print(r.cookies)
 
-    cook = r.cookies.get_dict()
+    # cook = r.cookies.get_dict()
 
-    r = s.get("https://localhost:8080/api/ehs/tc/uni/jh3389",
-              cookies=cook)
+    # r = s.get("https://localhost:8080/api/ehs/tc/uni/jh3389", cookies=cook)
+    # print(r.status_code)
+    # print(r.headers)
+
+def login():
+
+    s = requests.Session()
+    s.auth = ('user', 'userPass')
+    r = s.post('https://localhost:8443/login', verify=False)
+
     print(r.status_code)
-    print(r.headers)
+    print(r.cookies)
+
+    # cook = r.cookies.get_dict()
+
+    # r = s.get("https://localhost:8080/api/ehs/tc/uni/jh3389", cookies=cook)
+    # print(r.status_code)
+    # print(r.headers)
 
 
 def foologin2():
@@ -46,7 +54,7 @@ def foologin2():
 
 
 def main():
-    foologin()
+    login()
 
 
 if __name__ == '__main__':

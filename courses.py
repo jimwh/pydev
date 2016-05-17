@@ -63,7 +63,7 @@ def rename_files(src_slide, dest_dir):
 
 def resize_images(files):
     for img_name in files:
-        base_height = 500
+        base_height = 750
         img = Image.open(img_name)
         ht_percent = (base_height / float(img.size[1]))
         wd_size = int((float(img.size[0]) * float(ht_percent)))

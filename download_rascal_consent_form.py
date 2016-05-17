@@ -30,6 +30,7 @@ select CH.CONSENTNUMBER, CD.CONSENTHEADEROID, CD.FILECONTEXT,\
 
 DIR_NAME = "/tmp/cumc/"
 
+
 def download_rascal_consent_form():
     cursor = db_connector.DBConnector.cursor()
     cursor.execute(SQL_RASCAL_CONSENT_FORM)
@@ -56,6 +57,7 @@ def dump_to_file(file_name, blob_data):
         file.close()
     except IOError:
         print('i/o error... {}'.format(file_name))
+
 
 def main():
     prop = jproperties.Properties()

@@ -1,6 +1,8 @@
 #!/usr/bin/python
 
+
 def build_function_table(pattern, search, replace):
+
     def fun1(word):
         return True
 
