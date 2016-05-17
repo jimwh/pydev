@@ -2,14 +2,12 @@
 
 import os
 import sys
-import zipfile
-import time
 
 from db import db_connector
 from db import jproperties
 
 SQL_CONSENT_SNAPSHOT_BY_ID = "\
-select OID, CONSENTHEADEROID, FILECONTEXT\
+select OID, CONSENTHEADEROID, FILECONTEXT, CREATIONDATE\
   from CONSENTSNAPSHOT where OID = :snapshot_id"
 
 
@@ -23,7 +21,7 @@ def download_consent_snapshot(snapshot_id):
     res = cursor.fetchone()
 
     if res is not None:
-
+        print(res[3])
         if not os.path.exists(DIR_NAME):
             os.makedirs(DIR_NAME)
 
