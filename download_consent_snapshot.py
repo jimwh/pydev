@@ -22,6 +22,9 @@ def download_consent_snapshot(snapshot_id):
 
     if res is not None:
         print(res[3])
+        creation_date = res[3]
+        print(creation_date.strftime('%Y-%m-%d-%H-%M-%S'))
+
         if not os.path.exists(DIR_NAME):
             os.makedirs(DIR_NAME)
 
@@ -45,9 +48,7 @@ def main():
         print('error: connection string undefined')
         return 1
     db_connector.DBConnector(connection_str)
-
-    download_consent_snapshot(int(sys.argv[2]))
-
+    download_consent_snapshot(sys.argv[2])
     db_connector.DBConnector.close()
 
     return 0
