@@ -69,5 +69,3 @@ if __name__ == '__main__':
         print('usage: {} [prod|dev|staging|local] <snapshot_id>'.format(sys.argv[0]))
         sys.exit(1)
     sys.exit(main())
-
-
