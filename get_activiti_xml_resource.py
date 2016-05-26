@@ -2,13 +2,14 @@
 
 import sys
 
-from iacuc import db_connector
+from db import db_connector
 
 #
 # local
 # rascal/rascal@127.0.0.1/XE
 #
 sql_resource = "select ID_, NAME_, BYTES_ from ACT_GE_BYTEARRAY where NAME_ like '%.xml'"
+
 
 def download_xml_resource():
     cursor = db_connector.DBConnector.cursor()
