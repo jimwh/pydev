@@ -11,6 +11,7 @@ SQL_INSERT_BLOB = "insert into foobar(id, filename, content) values(:1, :2, :3)"
 
 SQL_UPDATE_BLOB = "update foobar set content = :1 where id=1 and filename='foome'"
 
+
 def insert_blob():
     data = read_file()
     cursor = db_connector.DBConnector.cursor()
@@ -38,6 +39,7 @@ def read_file():
     file.close()
     return data
 
+
 def dump_to_file(file_name, blob_data):
     try:
         file = open(file_name, 'w')
@@ -45,6 +47,7 @@ def dump_to_file(file_name, blob_data):
         file.close()
     except IOError:
         print('i/o error... {}'.format(file_name))
+
 
 def download_blob():
     cursor = db_connector.DBConnector.cursor()

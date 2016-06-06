@@ -6,9 +6,10 @@ import sys
 from db import db_connector
 from db import jproperties
 
-SQL_CONSENT_SNAPSHOT_BY_ID = "\
-select OID, CONSENTHEADEROID, FILECONTEXT, CREATIONDATE\
-  from CONSENTSNAPSHOT where OID = :snapshot_id"
+SQL_CONSENT_SNAPSHOT_BY_ID = """
+select OID, CONSENTHEADEROID, FILECONTEXT, CREATIONDATE
+  from CONSENTSNAPSHOT where OID = :snapshot_id
+  """
 
 
 DIR_NAME = "/tmp/consent_snapshot/"
