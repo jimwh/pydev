@@ -8,7 +8,7 @@ import re
 import glob
 import Image
 
-IMG_FILE_NAME_PATTERN = "[Ss]lide[0-9]+.[Pp][Nn][Gg]$|[Ii]mg[0-9]+.[Pp][Nn][Gg]$|[Ii]mg[0-9]+.[Jj][Pp][Gg]$"
+IMG_FILE_NAME_PATTERN = "[Ss]lide[0-9]+.[Jj][Pp][Gg]$|[Ii]mg[0-9]+.[Pp][Nn][Gg]$|[Ii]mg[0-9]+.[Jj][Pp][Gg]$"
 HTML_EXT = ".html"
 TEMPLATE_TEXT = """
     <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
@@ -57,7 +57,9 @@ def rename_files(src_slide, dest_dir):
         dest_file = dest_dir + "/" + base_name
         dest_file_list.append(dest_file)
         (name, ext) = os.path.splitext(dest_file)
-        os.rename(dest_file, name + ext.lower())
+        # os.rename(dest_file, name + ext.lower())
+        print(ext)
+        os.rename(dest_file, name + ext)
     return dest_file_list
 
 
@@ -130,7 +132,7 @@ def execute(src_dir, template_dir, dest_dir):
 
     # resize the img file under destination directory
     # and the original img in src dir untouched
-    resize_images(dest_file_list)
+    # resize_images(dest_file_list)
 
     # strip path
     base_file_list = [os.path.basename(x) for x in dest_file_list]
